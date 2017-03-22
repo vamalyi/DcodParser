@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form action=".">
+        <select name="region" onchange="form:submit()">
+            {% for region in regions %}
+                <option name="region" value="{{ region.id }}" {% if selected_region.name == region.name %} selected{% endif %}>{{ region.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <input id="selected_region" type="hidden" value="{{ selected_region.id }}">
+    <div id="container" style="width:100%; height:400px;"></div>
+{% endblock %}
+
+{% block script %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/5.0.9/highcharts.js"></script>
+    <script>
+        var region = $('#selected_region').val();
+        $.get('/chart/' + region, function (data) {
+            Highcharts.chart('container', {
+                title: {
+                    text: 'Data'
+                },
+                xAxis: {
+                    categories: data['countries'],
+                },
+                yAxis: {
+                    tickInterval: 10
+                },
+                series: [{
+                    type: 'column',
+                    colorByPoint: true,
+                    data: data['values'],
+                    showInLegend: false
+                }]
+            });
+        });
+    </script>
+{% endblock %}
+
